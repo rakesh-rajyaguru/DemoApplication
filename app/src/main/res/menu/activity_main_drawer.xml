@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_autocomplete"
+            android:icon="@drawable/ic_autorenew_black"
+            android:title="@string/autocomplete" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/image_process" />
+        <item
+            android:id="@+id/nav_tracker"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/app_tracker" />
+        <item
+            android:id="@+id/nav_animation"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/animation" />
+        <item
+            android:id="@+id/nav_svg_animation"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/svg_animation" />
+        <item
+            android:id="@+id/nav_admin"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/device_manger" />
+    </group>
+</menu>
+
+
+

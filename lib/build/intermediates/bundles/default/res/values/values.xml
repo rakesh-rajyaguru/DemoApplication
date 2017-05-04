@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PdfDroid</string>
+    <string name="gen_pdf_file">Generating PDF File</string>
+    <string name="gen_please_wait">Please Wait</string>
+</resources>
