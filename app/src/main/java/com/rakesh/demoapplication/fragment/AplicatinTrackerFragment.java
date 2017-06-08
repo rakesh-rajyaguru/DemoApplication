@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -17,17 +16,20 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.hendrix.pdfmyxml.PdfDocument;
 import com.hendrix.pdfmyxml.viewRenderer.AbstractViewRenderer;
@@ -39,7 +41,6 @@ import com.rakesh.demoapplication.adapter.AppAdapter;
 import com.rakesh.demoapplication.pojo.AppList;
 
 import java.io.File;
-import java.lang.annotation.Documented;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +59,13 @@ public class AplicatinTrackerFragment extends Fragment {
     List<AbstractViewRenderer> pagelist = new ArrayList<>();
     AppAdapter installedAppAdapter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        Log.e(getClass().getSimpleName(), "onCreate");
 
-
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -67,7 +73,6 @@ public class AplicatinTrackerFragment extends Fragment {
         Log.e("Method Call", "onCreateView");
         return inflater.inflate(R.layout.app_uptime_layout, container, false);
     }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -113,6 +118,26 @@ public class AplicatinTrackerFragment extends Fragment {
         Log.e("Method Call", "onHiden change:" + hidden);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        Log.e(getClass().getSimpleName(), "Option menu created");
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        Log.e(getClass().getSimpleName(), "Option menu prepared");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.e(getClass().getSimpleName(), "Option item selected ");
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initComponent() {
         if (getView() == null) {
             return;
@@ -137,12 +162,9 @@ public class AplicatinTrackerFragment extends Fragment {
         }
         getInstalledApps();
         FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                generatePage();
-                GeneratePdfDocument(mActivity);
-            }
+        fab.setOnClickListener(view -> {
+            generatePage();
+            GeneratePdfDocument(mActivity);
         });
     }
 
@@ -256,6 +278,7 @@ public class AplicatinTrackerFragment extends Fragment {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void GeneratePdfDocument(Context ctx) {
         try {
             PdfDocument doc = new PdfDocument(ctx);

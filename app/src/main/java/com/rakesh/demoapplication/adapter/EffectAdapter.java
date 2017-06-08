@@ -35,7 +35,7 @@ public class EffectAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        View v = mLayoutInflater.inflate(R.layout.item, null, false);
+        View v = mLayoutInflater.inflate(R.layout.item, parent, false);
         TextView t = (TextView) v.findViewById(R.id.list_item_text);
         Object o = getItem(position);
         int start = o.getClass().getName().lastIndexOf(".") + 1;

@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "D:\\WorkSpaceDemo\\DemoApplication\\lib\\build\\intermediates\\incremental\\mergeDebugAndroidTestResources\\merged.dir\\values\\values.xml",
+        "outputFile": "D:\\WorkSpace\\Demo\\DemoApplication\\lib\\build\\intermediates\\incremental\\mergeDebugAndroidTestResources\\merged.dir\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -4039,7 +4039,7 @@
                     "endOffset": 34486
                 },
                 "from": {
-                    "file": "D:\\WorkSpaceDemo\\DemoApplication\\lib\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "D:\\WorkSpace\\Demo\\DemoApplication\\lib\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 2,
                         "startColumn": 4,
@@ -4058,7 +4058,7 @@
                     "endOffset": 34547
                 },
                 "from": {
-                    "file": "D:\\WorkSpaceDemo\\DemoApplication\\lib\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "D:\\WorkSpace\\Demo\\DemoApplication\\lib\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -4077,7 +4077,7 @@
                     "endOffset": 34603
                 },
                 "from": {
-                    "file": "D:\\WorkSpaceDemo\\DemoApplication\\lib\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "D:\\WorkSpace\\Demo\\DemoApplication\\lib\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,

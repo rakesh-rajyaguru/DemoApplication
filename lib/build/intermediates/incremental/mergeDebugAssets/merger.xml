@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="D:\WorkSpaceDemo\DemoApplication\lib\src\main\assets"/><source path="D:\WorkSpaceDemo\DemoApplication\lib\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="D:\WorkSpaceDemo\DemoApplication\lib\src\debug\assets"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="D:\WorkSpace\Demo\DemoApplication\lib\src\main\assets"/><source path="D:\WorkSpace\Demo\DemoApplication\lib\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="D:\WorkSpace\Demo\DemoApplication\lib\src\debug\assets"/></dataSet></merger>

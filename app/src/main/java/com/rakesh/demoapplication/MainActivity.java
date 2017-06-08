@@ -1,12 +1,10 @@
 package com.rakesh.demoapplication;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -29,16 +28,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    ArrayList<Fragment> stackFragment = new ArrayList<>();
     public DrawerLayout drawer;
+    ArrayList<Fragment> stackFragment = new ArrayList<>();
     ActionBarDrawerToggle toggle;
     private FragmentManager.OnBackStackChangedListener mBackStackChangedListener =
-            new FragmentManager.OnBackStackChangedListener() {
-                @Override
-                public void onBackStackChanged() {
-                    updateDrawerToggle();
-                }
-            };
+            this::updateDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,22 +47,21 @@ public class MainActivity extends AppCompatActivity
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             public void onDrawerClosed(View view) {
+
             }
 
             public void onDrawerOpened(View drawerView) {
+
             }
         };
-        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        toggle.setToolbarNavigationClickListener(v -> onBackPressed());
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         addFragment(new DelayAutocompleteFragment(), getString(R.string.app_name));
-        Log.e("Method Call", "On Create");
-
+        final Snackbar snackBar = Snackbar.make(drawer, "Start App", Snackbar.LENGTH_LONG);
+        snackBar.setAction("Dismiss", v -> snackBar.dismiss());
+        snackBar.show();
+        Log.e(getClass().getSimpleName(), "On Create");
     }
 
     @Override
@@ -100,38 +93,50 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         getSupportFragmentManager().removeOnBackStackChangedListener(mBackStackChangedListener);
-        Log.e("Method Call", "On Pause");
+        Log.e(getClass().getSimpleName(), "On Pause");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         getSupportFragmentManager().addOnBackStackChangedListener(mBackStackChangedListener);
-        Log.e("Method Call", "On Resume");
+        Log.e(getClass().getSimpleName(), "On Resume");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e("Method Call", "On Stop");
+        Log.e(getClass().getSimpleName(), "On Stop");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e("Method Call", "On Start");
+        Log.e(getClass().getSimpleName(), "On Start");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.e("Method Call", "On Re Start");
+        Log.e(getClass().getSimpleName(), "On Re Start");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("Method Call", "On Destroy");
+        Log.e(getClass().getSimpleName(), "On Destroy");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.e(getClass().getSimpleName(), "Option Menu Created");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        Log.e(getClass().getSimpleName(), "Option Menu Prepare");
+        return super.onPrepareOptionsMenu(menu);
     }
 
     protected void updateDrawerToggle() {
@@ -182,20 +187,8 @@ public class MainActivity extends AppCompatActivity
     private void showExitDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Are you sure you want to Exit?");
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface arg0, int arg1) {
-                finish();
-            }
-        });
-        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
+        alertDialogBuilder.setPositiveButton("Yes", (arg0, arg1) -> finish());
+        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
