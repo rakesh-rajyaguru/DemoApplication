@@ -1,16 +1,10 @@
 package com.rakesh.demoapplication.receiver;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.rakesh.demoapplication.R;
 import com.rakesh.demoapplication.SensorService;
 
 /**

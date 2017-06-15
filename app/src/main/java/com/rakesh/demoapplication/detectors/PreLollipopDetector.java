@@ -10,6 +10,7 @@ public class PreLollipopDetector implements Detector {
     @Override
     public String getForegroundApp(Context context) {
         ActivityManager am = (ActivityManager) context.getSystemService(Service.ACTIVITY_SERVICE);
+        //noinspection deprecation
         ActivityManager.RunningTaskInfo foregroundTaskInfo = am.getRunningTasks(1).get(0);
         String foregroundTaskPackageName = foregroundTaskInfo .topActivity.getPackageName();
         PackageManager pm = context.getPackageManager();

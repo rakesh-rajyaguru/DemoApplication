@@ -43,6 +43,7 @@ public class RainbowTextView extends AppCompatTextView {
     }
 
     private int[] getRainbowColors() {
+        //noinspection deprecation
         return new int[]{
                 getResources().getColor(R.color.rainbow_red),
                 getResources().getColor(R.color.rainbow_yellow),

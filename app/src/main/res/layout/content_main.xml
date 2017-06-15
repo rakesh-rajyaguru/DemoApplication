@@ -16,11 +16,7 @@
         android:imeOptions="flagNoExtractUi|actionSearch"
         android:inputType="textCapSentences"
         tools:text="fsdfsdfsdfsd" />-->
-    <com.miguelcatalan.materialsearchview.MaterialSearchView
-        android:id="@+id/searchView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="?attr/actionBarSize" />
+
 
     <ProgressBar
         android:id="@+id/pb_loading_indicator"

@@ -4,14 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,14 +18,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -67,24 +66,8 @@ public class DelayAutocompleteFragment extends Fragment {
     private List<Prediction> resultList = new ArrayList<>();
     private GoogleMap mGoogleMap;
     private Marker customMarker;
-    private MaterialSearchView mSearchView;
     private ProgressBar progress;
     private Prediction book;
-
-    // Convert a view to bitmap
-    public static Bitmap createDrawableFromView(Context context, View view) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        view.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.buildDrawingCache();
-        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-        return bitmap;
-    }
 
     @Nullable
     @Override
@@ -99,13 +82,13 @@ public class DelayAutocompleteFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         Log.e(getClass().getSimpleName(), "onCreate");
-
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity) getActivity();
+        initComponent();
         initilizeMap();
         Log.e(getClass().getSimpleName(), "onActivity Created");
     }
@@ -150,6 +133,8 @@ public class DelayAutocompleteFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.e(getClass().getSimpleName(), "Destroy View");
+        mActivity.mSearchView.clearFocus();
+        mActivity.mSearchView.closeSearch();
     }
 
     @Override
@@ -157,7 +142,7 @@ public class DelayAutocompleteFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_main, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        mSearchView.setMenuItem(item);
+        mActivity.mSearchView.setMenuItem(item);
         Log.e(getClass().getSimpleName(), "Option menu created");
     }
 
@@ -200,11 +185,10 @@ public class DelayAutocompleteFragment extends Fragment {
 
 //        bookTitle.setEnabled(ServiceUtils.checkConnectivity(mActivity));
         progress = (ProgressBar) getView().findViewById(R.id.pb_loading_indicator);
-        mSearchView = (MaterialSearchView) v.findViewById(R.id.searchView);
-        mSearchView.setVoiceSearch(true);
+        mActivity.mSearchView.setVoiceSearch(true);
         adapter = new BookAutoCompleteAdapter(mActivity, resultList);
-        mSearchView.setAdapter(adapter);
-        mSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        mActivity.mSearchView.setAdapter(adapter);
+        mActivity.mSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (ServiceUtils.checkConnectivity(mActivity)) {
@@ -224,7 +208,7 @@ public class DelayAutocompleteFragment extends Fragment {
             }
         });
 
-        mSearchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+        mActivity.mSearchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
                 book = null;
@@ -232,11 +216,15 @@ public class DelayAutocompleteFragment extends Fragment {
 
             @Override
             public void onSearchViewClosed() {
+                book = null;
             }
         });
-        mSearchView.setOnItemClickListener((adapterView, view, position, id) -> {
-            book = (Prediction) adapterView.getItemAtPosition(position);
-            mSearchView.setQuery(book.getDescription(), false);
+        mActivity.mSearchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                book = (Prediction) parent.getItemAtPosition(position);
+                mActivity.mSearchView.setQuery(book.getDescription(), false);
+            }
         });
     }
 
@@ -245,16 +233,18 @@ public class DelayAutocompleteFragment extends Fragment {
             SupportMapFragment mMapFragment = SupportMapFragment.newInstance();
             getChildFragmentManager().beginTransaction().add(R.id.map_location, mMapFragment)
                     .commit();
-            mMapFragment.getMapAsync(googleMap -> {
-                mGoogleMap = googleMap;
-                if (mGoogleMap != null) {
-                    mGoogleMap.clear();
-                    mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                    mGoogleMap.getUiSettings().setAllGesturesEnabled(true);
-                    mGoogleMap.getUiSettings().setMapToolbarEnabled(true);
-                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(23.022505, 72.571362)
-                            , 10));
-                    initComponent();
+            mMapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    mGoogleMap = googleMap;
+                    if (mGoogleMap != null) {
+                        mGoogleMap.clear();
+                        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                        mGoogleMap.getUiSettings().setAllGesturesEnabled(true);
+                        mGoogleMap.getUiSettings().setMapToolbarEnabled(true);
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(23.022505, 72.571362)
+                                , 10));
+                    }
                 }
             });
         }
@@ -268,9 +258,12 @@ public class DelayAutocompleteFragment extends Fragment {
                 final Dialog errorDlg = GoogleApiAvailability.getInstance()
                         .getErrorDialog(mActivity, resultCode,
                                 9000);
-                errorDlg.setOnCancelListener(dialog -> {
-                    errorDlg.dismiss();
-                    mActivity.onBackPressed();
+                errorDlg.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        errorDlg.dismiss();
+                        mActivity.onBackPressed();
+                    }
                 });
                 errorDlg.show();
             }
@@ -291,7 +284,7 @@ public class DelayAutocompleteFragment extends Fragment {
                         mResult.getGeometry().getLocation().getLng()))
                 .title(mResult.getName())
                 .snippet(mResult.getFormattedAddress())
-                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(mActivity, marker))));
+                .icon(BitmapDescriptorFactory.fromBitmap(Utils.createDrawableFromView(mActivity, marker))));
         final View mapView = getChildFragmentManager().findFragmentById(R.id.map_location).getView();
         if (mapView == null) {
             return;
@@ -347,7 +340,7 @@ public class DelayAutocompleteFragment extends Fragment {
                 Gson gson = new Gson();
                 Example ps = gson.fromJson(response, Example.class);
                 setUpMap(ps.getResult());
-                mSearchView.closeSearch();
+                mActivity.mSearchView.closeSearch();
             }
             Log.i("INFO", response);
             progress.setVisibility(View.GONE);
@@ -398,7 +391,7 @@ public class DelayAutocompleteFragment extends Fragment {
                 resultList.clear();
                 resultList.addAll(locations);
                 adapter.notifyDataSetChanged();
-                mSearchView.showSuggestions();
+                mActivity.mSearchView.showSuggestions();
 
             }
             progress.setVisibility(View.GONE);

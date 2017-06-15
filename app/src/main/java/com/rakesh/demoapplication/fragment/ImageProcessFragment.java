@@ -1,10 +1,12 @@
 package com.rakesh.demoapplication.fragment;
 
+import android.Manifest;
 import android.app.Activity;
-import android.content.ContentUris;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -20,8 +22,6 @@ import android.graphics.Shader;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
@@ -29,7 +29,9 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.renderscript.Type;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,6 +48,7 @@ import android.widget.Toast;
 
 import com.rakesh.demoapplication.MainActivity;
 import com.rakesh.demoapplication.R;
+import com.rakesh.demoapplication.Utils.Utils;
 import com.rakesh.demoapplication.customview.PeekThroughImageView;
 
 import java.io.File;
@@ -57,12 +60,19 @@ import java.io.File;
  */
 
 public class ImageProcessFragment extends Fragment {
+    static final int REQUEST_CAPTURE = 1;
+    static final int REQUEST_PICK = 2;
+    static final int READ_EXTERNAL_STORAGE = 204;
     MainActivity mainActivity;
     TextView txtSelectImage, txtTextView;
     ImageView imgSelectedImage;
     PeekThroughImageView imgGray;
     String path_file = "";
-    Bitmap mBitmap;
+    Bitmap mBitmap, mBlurBitmap;
+    private Allocation allocation;
+    private Type t;
+    private RenderScript rs;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,10 +103,12 @@ public class ImageProcessFragment extends Fragment {
         imgGray = (PeekThroughImageView) v.findViewById(R.id.imgGray);
         txtSelectImage = (TextView) v.findViewById(R.id.btnSelectImage);
         txtTextView = (TextView) v.findViewById(R.id.txtTextView);
+
         txtSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                openFileManager();
+            public void onClick(View v) {
+                if (checkPermission(mainActivity))
+                    selectImage();
             }
         });
     }
@@ -116,44 +128,70 @@ public class ImageProcessFragment extends Fragment {
                 if (mBitmap == null) {
                     return;
                 }
-                imgSelectedImage.setVisibility(View.GONE);
-                txtTextView.setVisibility(View.GONE);
-                imgGray.setVisibility(View.GONE);
-                if (pos == 1) {
+                if (pos == 0) {
+                    imgSelectedImage.setImageBitmap(mBitmap);
+                    imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
+                } else if (pos == 1) {
+                    imgGray.setVisibility(View.GONE);
+                    imgSelectedImage.setVisibility(View.GONE);
                     txtTextView.setVisibility(View.VISIBLE);
                     txtTextView.setText("Rakesh");
                     changeTextShade();
                 } else if (pos == 2) {
                     doHighlightImage(mBitmap);
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 3) {
                     doGreyscale();
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 4) {
                     doSpia();
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 5) {
                     doBinary();
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 6) {
                     doInvert();
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 7) {
                     doalphBlue();
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 8) {
                     doalphPink();
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 9) {
                     doColorFilter(mBitmap, 1, 2, 3);
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 10) {
-                    blurBitmap(mBitmap, 10, mainActivity);
+                    blurBitmap(mBlurBitmap, 10, mainActivity);
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 11) {
                     imgGray.setVisibility(View.VISIBLE);
+                    imgSelectedImage.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                 } else if (pos == 12) {
                     imgSelectedImage.setVisibility(View.VISIBLE);
+                    imgGray.setVisibility(View.GONE);
+                    txtTextView.setVisibility(View.GONE);
                     doCircleMask();
                 }
             }
@@ -173,191 +211,52 @@ public class ImageProcessFragment extends Fragment {
         txtTextView.getPaint().setShader(shader);
     }
 
-    private void openFileManager() {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(Intent.createChooser(intent, "Select File"), 200);
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-        if (requestCode == 200 && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            Uri file_uri = data.getData();
-            if (isKitKat) {
-                path_file = getPath(mainActivity, file_uri);
-            }
-            if (!isKitKat) {
-                path_file = getRealPathFromURI(file_uri);
-            }
-
-            //  path_file = getRealPathFromURI(file_uri);
-
-            if (path_file == null) {
-                Toast.makeText(mainActivity, "Path not found", Toast.LENGTH_SHORT).show();
-            }
-            try {
-                if (formatFile(new File(path_file).getName()).equalsIgnoreCase("jpg") ||
-                        formatFile(new File(path_file).getName()).equalsIgnoreCase("jpeg") ||
-                        formatFile(new File(path_file).getName()).equalsIgnoreCase("png") ||
-                        formatFile(new File(path_file).getName()).equalsIgnoreCase("gif")
-                        ) {
-                    txtSelectImage.setText(path_file);
-                    mBitmap = BitmapFactory.decodeFile(path_file, new BitmapFactory.Options());
-                    imgSelectedImage.setImageBitmap(mBitmap);
-                    imgGray.setImageBitmap(mBitmap);
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            if (requestCode == REQUEST_CAPTURE) {
+                Bundle extras = data.getExtras();
+                mBitmap = (Bitmap) extras.get("data");
+                mBlurBitmap = mBitmap;
+                imgGray.setImageBitmap(mBitmap);
+                imgSelectedImage.setImageBitmap(mBitmap);
+                imgSelectedImage.setVisibility(View.VISIBLE);
+            } else if (requestCode == REQUEST_PICK && data.getData() != null) {
+                Uri file_uri = data.getData();
+                if (isKitKat) {
+                    path_file = Utils.getPath(mainActivity, file_uri);
                 }
+                if (!isKitKat) {
+                    path_file = Utils.getRealPathFromURI(mainActivity, file_uri);
+                }
+                if (path_file == null) {
+                    Toast.makeText(mainActivity, "Path not found", Toast.LENGTH_SHORT).show();
+                }
+                try {
+                    if (Utils.formatFile(new File(path_file).getName()).equalsIgnoreCase("jpg") ||
+                            Utils.formatFile(new File(path_file).getName()).equalsIgnoreCase("jpeg") ||
+                            Utils.formatFile(new File(path_file).getName()).equalsIgnoreCase("png") ||
+                            Utils.formatFile(new File(path_file).getName()).equalsIgnoreCase("gif")
+                            ) {
+                        txtSelectImage.setText(path_file);
+                        mBitmap = BitmapFactory.decodeFile(path_file, new BitmapFactory.Options());
+                        mBlurBitmap = BitmapFactory.decodeFile(path_file, new BitmapFactory.Options());
+                        imgGray.setImageBitmap(mBitmap);
+                        imgSelectedImage.setImageBitmap(mBitmap);
+                        imgSelectedImage.setVisibility(View.VISIBLE);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-    public String formatFile(String name) {
-        String filenameArray[] = name.split("\\.");
-        checkSize(name);
-        return filenameArray[filenameArray.length - 1];
-    }
-
-    public boolean checkSize(String path) {
-        File file = new File(path);
-        long fileSizeInBytes = file.length();
-        long fileSizeInKB = fileSizeInBytes / 1024;
-        long fileSizeInMB = fileSizeInKB / 1024;
-
-        return fileSizeInMB <= 1;
-    }
-
-    private String getRealPathFromURI(Uri filePath) {
-        String path = null;
-        String[] proj = {MediaStore.MediaColumns.DATA};
-        Cursor cursor = mainActivity.getContentResolver().query(filePath, proj, null, null, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                path = cursor.getString(column_index);
-            }
-            cursor.close();
-        }
-        return path;
-    }
-
-    public String getPath(final Context context, final Uri uri) {
-
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
-        // DocumentProvider
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
-                // ExternalStorageProvider
-                if (isExternalStorageDocument(uri)) {
-                    final String docId = DocumentsContract.getDocumentId(uri);
-                    final String[] split = docId.split(":");
-                    final String type = split[0];
-
-                    if ("primary".equalsIgnoreCase(type)) {
-                        return Environment.getExternalStorageDirectory() + "/" + split[1];
-                    } else {
-                        return "/storage/" + split[0] + "/" + split[1];
                     }
 
-                    // TODO handle non-primary volumes
-                }
-                // DownloadsProvider
-                else if (isDownloadsDocument(uri)) {
-
-                    final String id = DocumentsContract.getDocumentId(uri);
-                    final Uri contentUri = ContentUris.withAppendedId(
-                            Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-
-                    return getDataColumn(context, contentUri, null, null);
-                }
-                // MediaProvider
-                else if (isMediaDocument(uri)) {
-                    final String docId = DocumentsContract.getDocumentId(uri);
-                    final String[] split = docId.split(":");
-                    final String type = split[0];
-
-                    Uri contentUri = null;
-                    if ("image".equals(type)) {
-                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                    } else if ("video".equals(type)) {
-                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                    } else if ("audio".equals(type)) {
-                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                    }
-
-                    final String selection = "_id=?";
-                    final String[] selectionArgs = new String[]{
-                            split[1]
-                    };
-
-                    return getDataColumn(context, contentUri, selection, selectionArgs);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            // MediaStore (and general)
-            else if ("content".equalsIgnoreCase(uri.getScheme())) {
-                return getDataColumn(context, uri, null, null);
-            }
-            // File
-            else if ("file".equalsIgnoreCase(uri.getScheme())) {
-                return uri.getPath();
-            }
+
+
         }
-
-        return null;
-    }
-
-    public String getDataColumn(Context context, Uri uri, String selection,
-                                String[] selectionArgs) {
-
-        Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection = {
-                column
-        };
-
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
-            if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return null;
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    public boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    public boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    public boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
     public void doHighlightImage(Bitmap src) {
@@ -508,17 +407,34 @@ public class ImageProcessFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        if (mBitmap != null)
+        if (mBitmap != null) {
             mBitmap.recycle();
+            mBitmap = null;
+        }
+        if (mBlurBitmap != null) {
+            mBlurBitmap.recycle();
+            mBlurBitmap = null;
+        }
+        if (rs != null) {
+            rs.destroy();
+        }
+
+        if (allocation != null) {
+            allocation.destroy();
+        }
+
+        if (t != null) {
+            t.destroy();
+        }
         super.onDestroyView();
     }
 
     public void blurBitmap(Bitmap bitmap, float radius, Context context) {
         //Create renderscript
-        RenderScript rs = RenderScript.create(context);
+        rs = RenderScript.create(context);
         //Create allocation from Bitmap
-        Allocation allocation = Allocation.createFromBitmap(rs, bitmap);
-        Type t = allocation.getType();
+        allocation = Allocation.createFromBitmap(rs, bitmap);
+        t = allocation.getType();
         //Create allocation with the same type
         Allocation blurredAllocation = Allocation.createTyped(rs, t);
         //Create script
@@ -532,11 +448,8 @@ public class ImageProcessFragment extends Fragment {
         //Copy script result into bitmap
         blurredAllocation.copyTo(bitmap);
         //Destroy everything to free memory
-        allocation.destroy();
         blurredAllocation.destroy();
         blurScript.destroy();
-        t.destroy();
-        rs.destroy();
         imgSelectedImage.setImageBitmap(bitmap);
     }
 
@@ -545,17 +458,80 @@ public class ImageProcessFragment extends Fragment {
                 mBitmap.getWidth(), mBitmap.getHeight(),
                 Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-
-// Draw the original bitmap (DST during Porter-Duff transfer)
-        canvas.drawBitmap(mBitmap, 0, 0, null);
-
-// DST_IN = Whatever was there, keep the part that overlaps
-// with what I'm drawing now
+        canvas.drawBitmap(bitmap, 0, 0, null);
         Paint maskPaint = new Paint();
         maskPaint.setXfermode(
                 new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        canvas.drawBitmap(mBitmap, 0, 0, maskPaint);
-//        imgSelectedImage.setImageBitmap(mBitmap);
+        canvas.drawBitmap(bitmap, 0, 0, maskPaint);
+    }
+
+    private void selectImage() {
+        final CharSequence[] items = {"Take Picture", "Choose from Library",
+                "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                boolean result = checkPermission(mainActivity);
+                if (result) {
+                    if (items[which].equals("Take Picture")) {
+                        dispatchTakeVideoIntent();
+                    } else if (items[which].equals("Choose from Library")) {
+                        openFileManager();
+                    } else if (items[which].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                }
+            }
+        });
+
+        builder.show();
+    }
+
+
+    public boolean checkPermission(final Context context) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest
+                    .permission.READ_EXTERNAL_STORAGE)) {
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
+                alertBuilder.setCancelable(true);
+                alertBuilder.setTitle("Permission necessary");
+                alertBuilder.setMessage("External storage permission is necessary");
+                alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface
+                        .OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions((Activity) context, new String[]
+                                {Manifest.permission.WRITE_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE)
+                        ;
+                    }
+                });
+
+                AlertDialog alert = alertBuilder.create();
+                alert.show();
+
+            } else {
+                ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest
+                        .permission.WRITE_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void openFileManager() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intent, "Select File"), REQUEST_PICK);
+    }
+
+    private void dispatchTakeVideoIntent() {
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takeVideoIntent, REQUEST_CAPTURE);
     }
 
 }

@@ -21,7 +21,6 @@ import java.util.List;
 public class BookAutoCompleteAdapter extends BaseAdapter {
     private Context mContext;
     private List<Prediction> resultList = new ArrayList<>();
-    private String API_URL = "";
 
     public BookAutoCompleteAdapter(Context context, List<Prediction> list) {
         mContext = context;

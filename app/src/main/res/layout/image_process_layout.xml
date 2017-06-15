@@ -22,6 +22,16 @@
         android:gravity="center"
         android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/imgSelectImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btnSelectImage"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/app_name"
+        android:src="@mipmap/ic_launcher_round"
+        android:visibility="gone" />
+
     <com.rakesh.demoapplication.customview.PeekThroughImageView
         android:id="@+id/imgGray"
         android:layout_width="match_parent"
@@ -33,16 +43,5 @@
         android:scaleType="fitXY"
         android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/imgSelectImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/btnSelectImage"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/app_name"
-        android:scaleType="fitXY"
-        android:src="@mipmap/ic_launcher_round"
-        android:visibility="gone" />
+
 </RelativeLayout>

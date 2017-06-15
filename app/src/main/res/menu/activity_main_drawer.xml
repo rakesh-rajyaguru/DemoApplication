@@ -26,6 +26,10 @@
             android:id="@+id/nav_admin"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/device_manger" />
+        <item
+            android:id="@+id/nav_browser"
+            android:icon="@drawable/ic_open_in_browser"
+            android:title="@string/browser" />
     </group>
 </menu>
 

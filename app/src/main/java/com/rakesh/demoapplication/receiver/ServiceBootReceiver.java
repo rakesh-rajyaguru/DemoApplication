@@ -10,7 +10,6 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.rakesh.demoapplication.R;
-import com.rakesh.demoapplication.SensorService;
 
 /**
  * Created by fabio

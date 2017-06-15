@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -126,22 +127,28 @@ public class AnimationActivity extends Fragment {
 
         rope = YoYo.with(Techniques.FadeIn).duration(1000).playOn(mTarget);// after start,just click mTarget view, rope is not init
 
-        mListView.setOnItemClickListener((parent, view, position, id) -> {
-            Techniques technique = (Techniques) view.getTag();
-            rope = YoYo.with(technique).duration(1200)
-                    .interpolate(new AccelerateDecelerateInterpolator())
-                    .listen(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-                            Toast.makeText(mActivity, "canceled", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .playOn(mTarget);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Techniques technique = (Techniques) view.getTag();
+                rope = YoYo.with(technique).duration(1200)
+                        .interpolate(new AccelerateDecelerateInterpolator())
+                        .listen(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                                Toast.makeText(mActivity, "canceled", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .playOn(mTarget);
+            }
         });
 
-        mTarget.setOnClickListener(v -> {
-            if (rope != null) {
-                rope.stop(true);
+        mTarget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (rope != null) {
+                    rope.stop(true);
+                }
             }
         });
     }

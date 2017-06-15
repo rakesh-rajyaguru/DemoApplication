@@ -8,14 +8,15 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
-    java.lang.IllegalArgumentException: No config chosen
-    at
-    com.google.maps.api.android.lib6.gmm6.vector.ak.a(:com.google.android.gms.DynamiteModulesB:25)
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.GET_TASKS" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:name=".MyApplication"

@@ -1,6 +1,5 @@
 package com.rakesh.demoapplication;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -16,26 +15,17 @@ import com.rakesh.demoapplication.detectors.PreLollipopDetector;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import in.omerjerk.libscreenshotter.Screenshotter;
-
 
 /**
- * Created by fabio
+ * Created by rakesh
  * on 30/01/2016.
  */
+
 public class SensorService extends Service {
-    private Detector detector;
     private Context mContext;
     private Timer timer;
     private TimerTask timerTask;
-    private Intent mData;
-    private int resultcode;
 
-    @Override
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
-        Log.e(getClass().getSimpleName(), "on start");
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -54,6 +44,7 @@ public class SensorService extends Service {
     }
 
     public String getForegroundApp(Context context) {
+        Detector detector;
         if (Utils.postLollipop())
             detector = new LollipopDetector();
         else
@@ -107,14 +98,6 @@ public class SensorService extends Service {
                     i++;
                     Utils.setPrefrence(mContext, foregroundApp, i);
                     Log.i("in timer", foregroundApp);
-                    if (foregroundApp.equalsIgnoreCase("com.whatsapp")) {
-                        Screenshotter.getInstance()
-                                .setSize(720, 1280)
-                                .takeScreenshot(SensorService.this, Activity.RESULT_OK, mData,
-                                        bitmap -> {
-
-                                        });
-                    }
                 }
             }
         };
@@ -127,9 +110,6 @@ public class SensorService extends Service {
             timer = null;
         }
     }
-
-
-
 
 
 }

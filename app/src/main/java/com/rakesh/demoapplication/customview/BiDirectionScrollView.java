@@ -2,8 +2,6 @@ package com.rakesh.demoapplication.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,10 +16,6 @@ import com.rakesh.demoapplication.Utils.Utils;
  *         Extends Framelayout and uses its first children as a scrollable view.
  */
 public class BiDirectionScrollView extends FrameLayout {
-    public class AndroidUtils {
-
-    }
-
     /**
      * Factor after which a scrolling direction cancels the other. For example
      * if I scroll 10 up and X left, this variable will be used so that X is
@@ -34,79 +28,16 @@ public class BiDirectionScrollView extends FrameLayout {
      */
     private static final int SCROLL_DIRECTION_OVERRIDE_FACTOR = 3;
     private static final float SCROLL_THRESHOLD_DISTANCE_DIP = 48;
-
-    private class BiDirectionScrollViewFlinger implements Runnable {
-        private final BiDirectionScrollView view;
-        private final Scroller scroller;
-
-        private int lastX = 0;
-        private int lastY = 0;
-
-        BiDirectionScrollViewFlinger(final BiDirectionScrollView _view) {
-            view = _view;
-            scroller = new Scroller(_view.getContext());
-        }
-
-        void start(final int _velocityX, final int _velocityY) {
-            final View firstChild = view.getChildAt(0);
-            if (firstChild == null) {
-                return;
-            }
-
-            final int velocityX;
-            final int velocityY;
-            if (view.currentScrollGestureYOverride) {
-                velocityX = 0;
-            } else {
-                velocityX = _velocityX;
-            }
-            if (view.currentScrollGestureXOverride) {
-                velocityY = 0;
-            } else {
-                velocityY = _velocityY;
-            }
-
-            int initialX = view.getScrollX();
-            int initialY = view.getScrollY();
-            scroller.fling(0, 0, velocityX, velocityY, -Integer.MAX_VALUE, Integer.MAX_VALUE, -Integer.MAX_VALUE,
-                    Integer.MAX_VALUE);
-
-            lastX = initialX;
-            lastY = initialY;
-            view.post(this);
-        }
-
-        @Override
-        public void run() {
-            if (scroller.isFinished()) {
-                return;
-            }
-
-            boolean more = scroller.computeScrollOffset();
-            int x = scroller.getCurrX();
-            int y = scroller.getCurrY();
-            view.scrollTo(lastX - x, lastY - y);
-
-            if (more) {
-                view.post(this);
-            }
-        }
-
-        boolean isFlinging() {
-            return !scroller.isFinished();
-        }
-
-        void forceFinished() {
-            if (!scroller.isFinished()) {
-                scroller.forceFinished(true);
-            }
-        }
-    }
-
     private final BiDirectionScrollViewFlinger flinger;
     private final GestureDetector scrollGestureDetector;
     private final float scrollThresholdDistance;
     private OnTouchListener touchListener = null;
+    private boolean currentScrollGestureBroken = false;
+    private boolean currentlyIntoScrollGesture = false;
+    private boolean currentScrollGestureXOverride = false;
+    private boolean currentScrollGestureYOverride = false;
+    private int initialDownX = -1;
+    private int initialDownY = -1;
 
     public BiDirectionScrollView(final Context context) {
         super(context);
@@ -199,13 +130,6 @@ public class BiDirectionScrollView extends FrameLayout {
         }
     }
 
-    private boolean currentScrollGestureBroken = false;
-    private boolean currentlyIntoScrollGesture = false;
-    private boolean currentScrollGestureXOverride = false;
-    private boolean currentScrollGestureYOverride = false;
-    private int initialDownX = -1;
-    private int initialDownY = -1;
-
     @Override
     public void setOnTouchListener(final OnTouchListener l) {
         touchListener = l;
@@ -256,5 +180,77 @@ public class BiDirectionScrollView extends FrameLayout {
      */
     public boolean isCurrentlyIntoScrollGesture() {
         return !currentScrollGestureBroken && currentlyIntoScrollGesture;
+    }
+
+    public class AndroidUtils {
+
+    }
+
+    private class BiDirectionScrollViewFlinger implements Runnable {
+        private final BiDirectionScrollView view;
+        private final Scroller scroller;
+
+        private int lastX = 0;
+        private int lastY = 0;
+
+        BiDirectionScrollViewFlinger(final BiDirectionScrollView _view) {
+            view = _view;
+            scroller = new Scroller(_view.getContext());
+        }
+
+        void start(final int _velocityX, final int _velocityY) {
+            final View firstChild = view.getChildAt(0);
+            if (firstChild == null) {
+                return;
+            }
+
+            final int velocityX;
+            final int velocityY;
+            if (view.currentScrollGestureYOverride) {
+                velocityX = 0;
+            } else {
+                velocityX = _velocityX;
+            }
+            if (view.currentScrollGestureXOverride) {
+                velocityY = 0;
+            } else {
+                velocityY = _velocityY;
+            }
+
+            int initialX = view.getScrollX();
+            int initialY = view.getScrollY();
+            scroller.fling(0, 0, velocityX, velocityY, -Integer.MAX_VALUE, Integer.MAX_VALUE, -Integer.MAX_VALUE,
+                    Integer.MAX_VALUE);
+
+            lastX = initialX;
+            lastY = initialY;
+            view.post(this);
+        }
+
+        @Override
+        public void run() {
+            if (scroller.isFinished()) {
+                return;
+            }
+
+            boolean more = scroller.computeScrollOffset();
+            int x = scroller.getCurrX();
+            int y = scroller.getCurrY();
+            view.scrollTo(lastX - x, lastY - y);
+
+            if (more) {
+                view.post(this);
+            }
+        }
+
+        boolean isFlinging() {
+            return !scroller.isFinished();
+        }
+
+        void forceFinished() {
+            if (!scroller.isFinished()) {
+                scroller.forceFinished(true);
+            }
+        }
     }
 }

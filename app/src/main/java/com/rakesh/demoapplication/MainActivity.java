@@ -1,6 +1,7 @@
 package com.rakesh.demoapplication;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,9 +17,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.rakesh.demoapplication.Utils.Utils;
+import com.rakesh.demoapplication.customview.Backable;
 import com.rakesh.demoapplication.fragment.AnimationActivity;
 import com.rakesh.demoapplication.fragment.AplicatinTrackerFragment;
+import com.rakesh.demoapplication.fragment.BrowserLayoutFragment;
 import com.rakesh.demoapplication.fragment.DelayAutocompleteFragment;
 import com.rakesh.demoapplication.fragment.DevicePolicyFragment;
 import com.rakesh.demoapplication.fragment.ImageProcessFragment;
@@ -29,16 +35,23 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public DrawerLayout drawer;
+    public MaterialSearchView mSearchView;
     ArrayList<Fragment> stackFragment = new ArrayList<>();
     ActionBarDrawerToggle toggle;
-    private FragmentManager.OnBackStackChangedListener mBackStackChangedListener =
-            this::updateDrawerToggle;
+    Toolbar toolbar;
+    private FragmentManager.OnBackStackChangedListener mBackStackChangedListener
+            = new FragmentManager.OnBackStackChangedListener() {
+        @Override
+        public void onBackStackChanged() {
+            updateDrawerToggle();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -54,20 +67,45 @@ public class MainActivity extends AppCompatActivity
 
             }
         };
-        toggle.setToolbarNavigationClickListener(v -> onBackPressed());
+
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         addFragment(new DelayAutocompleteFragment(), getString(R.string.app_name));
         final Snackbar snackBar = Snackbar.make(drawer, "Start App", Snackbar.LENGTH_LONG);
-        snackBar.setAction("Dismiss", v -> snackBar.dismiss());
+        snackBar.setAction("Dismiss", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackBar.dismiss();
+            }
+        });
         snackBar.show();
         Log.e(getClass().getSimpleName(), "On Create");
+        mSearchView = (MaterialSearchView) findViewById(R.id.searchView);
+        mSearchView.setVoiceSearch(true);
+
     }
 
     @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle(title);
+        toolbar.setTitle(title);
+    }
+
+
+    @Override
     public void onBackPressed() {
+        Fragment currentFragment = Utils.getCurrentFragment(this);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (currentFragment != null && currentFragment instanceof BrowserLayoutFragment
+                && ((Backable) currentFragment).onBackPressed()) {
+            Toast.makeText(this, "Fragment back call", Toast.LENGTH_LONG).show();
+        } else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
@@ -112,7 +150,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e(getClass().getSimpleName(), "On Start");
+
     }
 
     @Override
@@ -170,6 +208,8 @@ public class MainActivity extends AppCompatActivity
             fragment = new SVGFragment();
         } else if (id == R.id.nav_admin) {
             fragment = new DevicePolicyFragment();
+        } else if (id == R.id.nav_browser) {
+            fragment = new BrowserLayoutFragment();
         } else {
             fragment = new DelayAutocompleteFragment();
         }
@@ -187,14 +227,23 @@ public class MainActivity extends AppCompatActivity
     private void showExitDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Are you sure you want to Exit?");
-        alertDialogBuilder.setPositiveButton("Yes", (arg0, arg1) -> finish());
-        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
     public void addFragment(Fragment frm, String title) {
-
         getSupportFragmentManager().beginTransaction().add(R.id.frame_container, frm, title)
                 .addToBackStack(title).commit();
         stackFragment.add(frm);
@@ -203,4 +252,6 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+
+
 }

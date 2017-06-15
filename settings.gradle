@@ -1,1 +1,1 @@
-include ':app', ':lib', ':library', ':libscreenshotter'
+include ':app', ':lib', ':library'

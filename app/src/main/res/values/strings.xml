@@ -46,6 +46,7 @@
 
     <string name="secure_message">Device is properly secured. Access is granted to secured content</string>
     <string name="device_admin_activation_message">Provide a message here explaining why an application needs to become a device administrator.</string>
+    <string name="browser">Browser</string>
 
 
 </resources>

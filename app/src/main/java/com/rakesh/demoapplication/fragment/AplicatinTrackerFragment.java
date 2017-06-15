@@ -66,6 +66,7 @@ public class AplicatinTrackerFragment extends Fragment {
         Log.e(getClass().getSimpleName(), "onCreate");
 
     }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -78,14 +79,18 @@ public class AplicatinTrackerFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity) getActivity();
-        initComponent();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            initComponent();
+        }
         Log.e("Method Call", "onActivity Created");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        initComponent();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            initComponent();
+        }
     }
 
     @Override
@@ -100,6 +105,7 @@ public class AplicatinTrackerFragment extends Fragment {
         Log.e("Method Call", "onCreateView");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -162,9 +168,12 @@ public class AplicatinTrackerFragment extends Fragment {
         }
         getInstalledApps();
         FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            generatePage();
-            GeneratePdfDocument(mActivity);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                generatePage();
+                GeneratePdfDocument(mActivity);
+            }
         });
     }
 
@@ -249,15 +258,13 @@ public class AplicatinTrackerFragment extends Fragment {
     }
 
     private void generatePage() {
-
         page = new AbstractViewRenderer(mActivity, R.layout.mylistview) {
-            private String _text;
-
             @Override
             protected void initView(View view) {
                 updateview(view);
             }
         };
+        pagelist.add(page);
     }
 
     private void updateview(View view) {
@@ -283,14 +290,17 @@ public class AplicatinTrackerFragment extends Fragment {
         try {
             PdfDocument doc = new PdfDocument(ctx);
 // add as many pages as you have
-            doc.addPage(page);
+            for (int i = 0; i < pagelist.size(); i++) {
+                doc.addPage(pagelist.get(i));
+            }
+
             doc.setRenderWidth(720);
             doc.setRenderHeight(1268);
             doc.setOrientation(PdfDocument.A4_MODE.PORTRAIT);
             doc.setProgressTitle(R.string.gen_pdf_file);
             doc.setProgressMessage(R.string.gen_please_wait);
             doc.setFileName("ApplicationList");
-            doc.setSaveDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS));
+            doc.setSaveDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
             doc.setInflateOnMainThread(false);
             doc.setListener(new PdfDocument.Callback() {
                 @Override
@@ -317,7 +327,6 @@ public class AplicatinTrackerFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
 
 
 }
