@@ -8,28 +8,32 @@
             android:title="@string/autocomplete" />
         <item
             android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_photo_black"
             android:title="@string/image_process" />
         <item
             android:id="@+id/nav_tracker"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_track_changes"
             android:title="@string/app_tracker" />
         <item
             android:id="@+id/nav_animation"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_animation"
             android:title="@string/animation" />
         <item
             android:id="@+id/nav_svg_animation"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_play_circle_outline"
             android:title="@string/svg_animation" />
         <item
             android:id="@+id/nav_admin"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_perm_device_information"
             android:title="@string/device_manger" />
         <item
             android:id="@+id/nav_browser"
             android:icon="@drawable/ic_open_in_browser"
             android:title="@string/browser" />
+        <item
+            android:id="@+id/nav_cropper"
+            android:icon="@drawable/ic_crop_black"
+            android:title="@string/crop" />
     </group>
 </menu>
 

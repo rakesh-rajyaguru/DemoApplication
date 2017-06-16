@@ -25,6 +25,7 @@ import com.rakesh.demoapplication.customview.Backable;
 import com.rakesh.demoapplication.fragment.AnimationActivity;
 import com.rakesh.demoapplication.fragment.AplicatinTrackerFragment;
 import com.rakesh.demoapplication.fragment.BrowserLayoutFragment;
+import com.rakesh.demoapplication.fragment.CropFragment;
 import com.rakesh.demoapplication.fragment.DelayAutocompleteFragment;
 import com.rakesh.demoapplication.fragment.DevicePolicyFragment;
 import com.rakesh.demoapplication.fragment.ImageProcessFragment;
@@ -210,6 +211,8 @@ public class MainActivity extends AppCompatActivity
             fragment = new DevicePolicyFragment();
         } else if (id == R.id.nav_browser) {
             fragment = new BrowserLayoutFragment();
+        } else if (id == R.id.nav_cropper) {
+            fragment = new CropFragment();
         } else {
             fragment = new DelayAutocompleteFragment();
         }
