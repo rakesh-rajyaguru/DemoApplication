@@ -117,14 +117,12 @@ final class BitmapLoadingWorkerTask extends AsyncTask<Void, Void, BitmapLoadingW
                 }
             }
             if (!completeCalled && result.bitmap != null) {
-                // fast release of unused bitmap
                 result.bitmap.recycle();
             }
         }
     }
 
     //region: Inner class: Result
-
     /**
      * The result of BitmapLoadingWorkerTask async loading.
      */

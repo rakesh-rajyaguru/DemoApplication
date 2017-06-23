@@ -61,11 +61,11 @@ public class MainActivity extends AppCompatActivity
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             public void onDrawerClosed(View view) {
-
+                Log.e("onDrawerClosed", view.toString());
             }
 
             public void onDrawerOpened(View drawerView) {
-
+                Log.e("onDrawerOpened", drawerView.toString());
             }
         };
 
@@ -103,11 +103,11 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         Fragment currentFragment = Utils.getCurrentFragment(this);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (currentFragment != null && currentFragment instanceof BrowserLayoutFragment
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else if (currentFragment != null && currentFragment instanceof BrowserLayoutFragment
                 && ((Backable) currentFragment).onBackPressed()) {
             Toast.makeText(this, "Fragment back call", Toast.LENGTH_LONG).show();
-        } else if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
         } else {
             if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
                 getSupportFragmentManager().popBackStackImmediate();

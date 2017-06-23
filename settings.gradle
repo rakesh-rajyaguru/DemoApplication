@@ -1,1 +1,1 @@
-include ':app', ':lib', ':library', ':cropper'
+include ':app', ':lib', ':library', ':cropper', ':DateTimeUtils'

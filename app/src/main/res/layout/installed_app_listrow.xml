@@ -52,5 +52,15 @@
                 tools:text="Duration 30000 Seconds" />
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/more"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/app_name"
+            android:padding="4dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_more_vert" />
     </LinearLayout>
 </android.support.v7.widget.CardView>

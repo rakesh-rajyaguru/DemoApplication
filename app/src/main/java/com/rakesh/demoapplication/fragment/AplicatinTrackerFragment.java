@@ -7,6 +7,7 @@ import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -26,10 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.hendrix.pdfmyxml.PdfDocument;
 import com.hendrix.pdfmyxml.viewRenderer.AbstractViewRenderer;
@@ -41,6 +39,7 @@ import com.rakesh.demoapplication.adapter.AppAdapter;
 import com.rakesh.demoapplication.pojo.AppList;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +50,6 @@ import java.util.List;
  */
 
 public class AplicatinTrackerFragment extends Fragment {
-    AbstractViewRenderer page;
     MainActivity mActivity;
     Intent mServiceIntent;
     ListView userInstalledApps;
@@ -166,7 +164,11 @@ public class AplicatinTrackerFragment extends Fragment {
                 mActivity.startService(mServiceIntent);
             }
         }
-        getInstalledApps();
+        try {
+            getInstalledApps();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,16 +180,23 @@ public class AplicatinTrackerFragment extends Fragment {
     }
 
 
-    private void getInstalledApps() {
+    private void getInstalledApps() throws Exception {
         List<AppList> res = new ArrayList<>();
         List<ApplicationInfo> packages = mActivity.getPackageManager()
                 .getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo packageInfo : packages) {
             int pos = Utils.getPrefrence(mActivity, packageInfo.packageName);
-            if (/*!isSystemPackage(packageInfo) &&*/ pos > 0) {
+            if (pos > 0) {
                 String appname = packageInfo.loadLabel(mActivity.getPackageManager()).toString();
                 Drawable icon = packageInfo.loadIcon(mActivity.getPackageManager());
-                res.add(new AppList(appname, pos, icon));
+                PackageInfo info = mActivity.getPackageManager().getPackageInfo(packageInfo.packageName, 0);
+                Field field = PackageInfo.class.getField("firstInstallTime");
+                String appFile = packageInfo.sourceDir;
+                long timestamp1 = field.getLong(info);
+                long timestamp2 = new File(appFile).lastModified(); //Epoch Time
+                boolean isSytemApp = isSystemPackage(packageInfo);
+                res.add(new AppList(appname, packageInfo.packageName, pos, icon, timestamp1,
+                        timestamp2, isSytemApp));
             }
         }
         installedApps.clear();
@@ -258,7 +267,7 @@ public class AplicatinTrackerFragment extends Fragment {
     }
 
     private void generatePage() {
-        page = new AbstractViewRenderer(mActivity, R.layout.mylistview) {
+        AbstractViewRenderer page = new AbstractViewRenderer(mActivity, R.layout.mylistview) {
             @Override
             protected void initView(View view) {
                 updateview(view);
@@ -267,35 +276,24 @@ public class AplicatinTrackerFragment extends Fragment {
         pagelist.add(page);
     }
 
+
     private void updateview(View view) {
-        LinearLayout mlistview = (LinearLayout) view.findViewById(R.id.mlist_view);
-        mlistview.removeAllViews();
-        for (int i = 0; i < installedApps.size(); i++) {
-            AppList tmp = installedApps.get(i);
-            View convertView = LayoutInflater.from(mActivity).inflate(R.layout.installed_app_listrow, null, false);
-            TextView textInListView = (TextView) convertView.findViewById(R.id.list_app_name);
-            TextView textdurationListView = (TextView) convertView.findViewById(R.id.list_app_duration);
-            ImageView imageInListView = (ImageView) convertView.findViewById(R.id.app_icon);
-            textInListView.setText(tmp.getName());
-            textdurationListView.setText(tmp.getDuration());
-            imageInListView.setImageDrawable(tmp.getIcon());
-            mlistview.addView(convertView);
-        }
 
-
+        List<AppList> tmplist = installedApps;
+        ListView mlistview = (ListView) view.findViewById(R.id.mlist_view);
+        AppAdapter tmp = new AppAdapter(mActivity, tmplist);
+        mlistview.setAdapter(tmp);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void GeneratePdfDocument(Context ctx) {
         try {
             PdfDocument doc = new PdfDocument(ctx);
-// add as many pages as you have
             for (int i = 0; i < pagelist.size(); i++) {
                 doc.addPage(pagelist.get(i));
             }
-
-            doc.setRenderWidth(720);
-            doc.setRenderHeight(1268);
+            doc.setRenderWidth(getResources().getDisplayMetrics().widthPixels);
+            doc.setRenderHeight(getResources().getDisplayMetrics().heightPixels);
             doc.setOrientation(PdfDocument.A4_MODE.PORTRAIT);
             doc.setProgressTitle(R.string.gen_pdf_file);
             doc.setProgressMessage(R.string.gen_please_wait);
@@ -318,7 +316,7 @@ public class AplicatinTrackerFragment extends Fragment {
 
                 @Override
                 public void onError(Exception e) {
-                    Log.i(PdfDocument.TAG_PDF_MY_XML, "Error");
+                    e.printStackTrace();
                 }
             });
 

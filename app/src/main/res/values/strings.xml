@@ -78,5 +78,6 @@
     <string name="drawer_option_toggle_multitouch">Multitouch: %1s</string>
     <string name="drawer_option_toggle_show_overlay">Show Overlay: %1s</string>
     <string name="drawer_option_toggle_show_progress_bar">Show Progress Bar: %1s</string>
+    <string name="search">Search</string>
 
 </resources>
