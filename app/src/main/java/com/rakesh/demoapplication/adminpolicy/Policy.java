@@ -26,12 +26,6 @@ import com.rakesh.demoapplication.receiver.DemoDeviceAdminReceiver;
 
 public class Policy {
     public static final int REQUEST_ADD_DEVICE_ADMIN = 1;
-
-    private static final String APP_PREF = "APP_PREF";
-    private static final String KEY_PASSWORD_LENGTH = "PW_LENGTH";
-    private static final String KEY_PASSWORD_QUALITY = "PW_QUALITY";
-    private static final String KEY_PASSWORD_MIN_UPPERCASE = "PW_MIN_UPPERCASE";
-
     // Password quality values.  This list must match the list
     // found in res/values/arrays.xml
     final static int[] PASSWORD_QUALITY_VALUES = new int[] {
@@ -42,7 +36,10 @@ public class Policy {
         DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC,
         DevicePolicyManager.PASSWORD_QUALITY_COMPLEX
     };
-
+    private static final String APP_PREF = "APP_PREF";
+    private static final String KEY_PASSWORD_LENGTH = "PW_LENGTH";
+    private static final String KEY_PASSWORD_QUALITY = "PW_QUALITY";
+    private static final String KEY_PASSWORD_MIN_UPPERCASE = "PW_MIN_UPPERCASE";
     private int mPasswordQuality;
     private int mPasswordLength;
     private int mPasswordMinUpperCase;
@@ -81,7 +78,7 @@ public class Policy {
             editor.putInt(KEY_PASSWORD_MIN_UPPERCASE, passwordMinUppercase);
             mPasswordMinUpperCase = passwordMinUppercase;
         }
-        editor.commit();
+        editor.apply();
     }
 
     public void readFromLocal() {

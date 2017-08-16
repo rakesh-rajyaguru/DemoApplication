@@ -2,7 +2,7 @@ package com.github.thunder413.datetimeutils;
 
 /**
  * DateTimeFormat
- * Patterns used to parse given date {@link DateTimeUtils} will use those pattern
+ *  Patterns used to parse given date {@link DateTimeUtils} will use those pattern
  *
  * @author thunder413
  * @version 1.0

@@ -41,7 +41,6 @@ public class DateTimeUtils {
 
     /**
      * Enable / Disable
-     *
      * @param state Debug state
      */
     public static void setDebug(boolean state) {
@@ -50,7 +49,6 @@ public class DateTimeUtils {
 
     /**
      * Set TimeZone
-     *
      * @param zone TimeZone
      */
     public static void setTimeZone(String zone) {
@@ -74,7 +72,7 @@ public class DateTimeUtils {
     /**
      * Convert a Java Date object to String
      *
-     * @param date   Date Object
+     * @param date Date Object
      * @param locale Locale
      * @return Date Object string representation
      */
@@ -91,7 +89,7 @@ public class DateTimeUtils {
      * Convert a date string to Java Date Object
      *
      * @param dateString Date String
-     * @param locale     Locale
+     * @param locale Locale
      * @return Java Date Object
      */
     public static Date formatDate(String dateString, Locale locale) {
@@ -110,7 +108,6 @@ public class DateTimeUtils {
         }
         return date;
     }
-
     /**
      * Convert a Java Date object to String
      *
@@ -120,7 +117,6 @@ public class DateTimeUtils {
     public static String formatDate(Date date) {
         return formatDate(date, Locale.getDefault());
     }
-
     /**
      * Convert a date string to Java Date Object
      *
@@ -135,10 +131,10 @@ public class DateTimeUtils {
      * Convert a timeStamp into a date object
      *
      * @param timeStamp TimeStamp
-     * @param units     Witch unit is whether seconds or milliseconds
+     * @param units Witch unit is whether seconds or milliseconds
+     *              @see DateTimeUnits#SECONDS
+     *              @see DateTimeUnits#MILLISECONDS
      * @return Date object
-     * @see DateTimeUnits#SECONDS
-     * @see DateTimeUnits#MILLISECONDS
      */
     public static Date formatDate(long timeStamp, DateTimeUnits units) {
         if (units.equals(DateTimeUnits.SECONDS))
@@ -146,25 +142,23 @@ public class DateTimeUtils {
         else
             return new Date(timeStamp);
     }
-
     /**
      * Convert a timeStamp into a date considering given timeStamp in milliseconds
      *
+     * @see DateTimeUnits#MILLISECONDS
      * @param timeStamp TimeStamp
      * @return Date object
-     * @see DateTimeUnits#MILLISECONDS
      */
     public static Date formatDate(long timeStamp) {
         return formatDate(timeStamp, DateTimeUnits.MILLISECONDS);
     }
-
     /**
      * Format date using a given pattern
-     * and apply supplied locale
+     *   and apply supplied locale
      *
-     * @param date    Date Object
+     * @param date Date Object
      * @param pattern Pattern
-     * @param locale  Locale
+     * @param locale Locale
      * @return Formatted date
      */
     public static String formatWithPattern(Date date, String pattern, Locale locale) {
@@ -178,44 +172,41 @@ public class DateTimeUtils {
 
     /**
      * Format date using a given pattern
-     * and apply supplied locale
+     *  and apply supplied locale
      *
-     * @param date    Date String
+     * @param date Date String
      * @param pattern Pattern
-     * @param locale  Locale
+     * @param locale Locale
      * @return Formatted date
      */
     public static String formatWithPattern(String date, String pattern, Locale locale) {
         return formatWithPattern(formatDate(date), pattern, locale);
     }
-
     /**
      * Format date using a given pattern
-     * apply default locale
+     *      apply default locale
      *
-     * @param date    Date Object
+     * @param date Date Object
      * @param pattern Pattern
+     *
      * @return Formatted date
      */
     public static String formatWithPattern(Date date, String pattern) {
         return formatWithPattern(date, pattern, Locale.getDefault());
     }
-
     /**
      * Format date using a given pattern
-     * apply default locale
-     *
-     * @param date    Date String
+     *      apply default locale
+     * @param date Date String
      * @param pattern Pattern
+     *
      * @return Formatted date
      */
     public static String formatWithPattern(String date, String pattern) {
         return formatWithPattern(date, pattern, Locale.getDefault());
     }
-
     /**
      * Build a pattern for given style
-     *
      * @param style DateTimeStyle
      * @return Pattern
      */
@@ -232,7 +223,6 @@ public class DateTimeUtils {
         }
         return pattern;
     }
-
     /**
      * Get localized date string
      *
@@ -245,7 +235,6 @@ public class DateTimeUtils {
         }
         return formatWithPattern(date, getPatternForStyle(style), locale);
     }
-
     /**
      * Get localized date string (Using default locale)
      *
@@ -255,7 +244,6 @@ public class DateTimeUtils {
     public static String formatWithStyle(String date, DateTimeStyle style, Locale locale) {
         return formatWithStyle(formatDate(date), style, locale);
     }
-
     /**
      * Get localized date string (Using default locale)
      *
@@ -265,7 +253,6 @@ public class DateTimeUtils {
     public static String formatWithStyle(Date date, DateTimeStyle style) {
         return formatWithStyle(date, style, Locale.getDefault());
     }
-
     /**
      * Get localized date string (Using default locale)
      *
@@ -278,10 +265,9 @@ public class DateTimeUtils {
 
     /**
      * Extract time from date without seconds
-     *
+     * @see DateTimeFormat#TIME_PATTERN_1
      * @param date Date object
      * @return Time String
-     * @see DateTimeFormat#TIME_PATTERN_1
      */
     public static String formatTime(Date date, boolean forceShowHours) {
         SimpleDateFormat iso8601Format = new SimpleDateFormat(DateTimeFormat.TIME_PATTERN_1, Locale.getDefault());
@@ -297,30 +283,24 @@ public class DateTimeUtils {
                         String.valueOf(minutes)) + ":"
                 + (seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) : String.valueOf(seconds));
     }
-
     /**
      * Extract time from date without seconds
-     *
      * @param date Date object
      * @return Time string
      */
     public static String formatTime(String date, boolean forceShowHours) {
         return formatTime(formatDate(date), forceShowHours);
     }
-
     /**
      * Extract time from date without seconds
-     *
      * @param date Date object
      * @return Time string
      */
     public static String formatTime(Date date) {
         return formatTime(date, false);
     }
-
     /**
      * Extract time from date without seconds
-     *
      * @param date Date object
      * @return Time string
      */
@@ -332,6 +312,7 @@ public class DateTimeUtils {
      * Convert millis to human readable time
      *
      * @param millis TimeStamp
+     *
      * @return Time String
      */
     public static String millisToTime(long millis) {
@@ -349,7 +330,6 @@ public class DateTimeUtils {
                 : String.valueOf(seconds));
 
     }
-
     /**
      * Convert millis to human readable time
      *
@@ -371,7 +351,6 @@ public class DateTimeUtils {
         }
         return (((hours * 60) + (minutes * 60) + seconds) * 1000);
     }
-
     /**
      * Tell whether or not a given string represent a date time string or a simple date
      *
@@ -381,10 +360,8 @@ public class DateTimeUtils {
     public static boolean isDateTime(String dateString) {
         return (dateString != null) && (dateString.trim().split(" ").length > 1);
     }
-
     /**
      * Tell whether or not a given date is yesterday
-     *
      * @param date Date Object
      * @return True if the date is yesterday False otherwise
      */
@@ -397,10 +374,8 @@ public class DateTimeUtils {
         return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)
                 && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR);
     }
-
     /**
      * Tell whether or not a given date is yesterday
-     *
      * @param dateString Date String
      * @return True if the date is yesterday False otherwise
      */
@@ -410,7 +385,6 @@ public class DateTimeUtils {
 
     /**
      * Tell whether or not a given date is today date
-     *
      * @param date Date object
      * @return True if date is today False otherwise
      */
@@ -420,14 +394,12 @@ public class DateTimeUtils {
 
     /**
      * Tell whether or not a given date is today date
-     *
      * @param dateString Date string
      * @return True if date is today False otherwise
      */
     public static boolean isToday(String dateString) {
         return isToday(formatDate(dateString));
     }
-
     /**
      * Get difference between two dates
      *
@@ -456,7 +428,6 @@ public class DateTimeUtils {
                 return (int) diffInMs;
         }
     }
-
     /**
      * Get difference between two dates
      *
@@ -468,7 +439,6 @@ public class DateTimeUtils {
     public static int getDateDiff(String nowDate, Date oldDate, DateTimeUnits dateDiff) {
         return getDateDiff(formatDate(nowDate), oldDate, dateDiff);
     }
-
     /**
      * Get difference between two dates
      *
@@ -480,7 +450,6 @@ public class DateTimeUtils {
     public static int getDateDiff(Date nowDate, String oldDate, DateTimeUnits dateDiff) {
         return getDateDiff(nowDate, formatDate(oldDate), dateDiff);
     }
-
     /**
      * Get difference between two dates
      *
@@ -492,13 +461,12 @@ public class DateTimeUtils {
     public static int getDateDiff(String nowDate, String oldDate, DateTimeUnits dateDiff) {
         return getDateDiff(nowDate, formatDate(oldDate), dateDiff);
     }
-
     /**
      * Get time ago of given date
      *
      * @param context Context
      * @param date    Date object
-     * @param style   DateTimeStyle
+     * @param style DateTimeStyle
      * @return Time ago string
      */
     public static String getTimeAgo(Context context, Date date, DateTimeStyle style) {
@@ -555,7 +523,6 @@ public class DateTimeUtils {
         }
         return phrase;
     }
-
     /**
      * Get time ago of given date
      *
@@ -566,12 +533,11 @@ public class DateTimeUtils {
     public static String getTimeAgo(Context context, String dateString) {
         return getTimeAgo(context, formatDate(dateString), DateTimeStyle.AGO_FULL_STRING);
     }
-
     /**
      * Get time ago of given date
      *
-     * @param context Context
-     * @param date    Representing a date time string
+     * @param context    Context
+     * @param date Representing a date time string
      * @return Time ago string
      */
     public static String getTimeAgo(Context context, Date date) {

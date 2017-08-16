@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().addOnBackStackChangedListener(mBackStackChangedListener);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+                this, drawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close) {
             public void onDrawerClosed(View view) {
                 Log.e("onDrawerClosed", view.toString());
             }
@@ -89,7 +90,6 @@ public class MainActivity extends AppCompatActivity
         Log.e(getClass().getSimpleName(), "On Create");
         mSearchView = (MaterialSearchView) findViewById(R.id.searchView);
         mSearchView.setVoiceSearch(true);
-
     }
 
     @Override
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        Log.e(getClass().getSimpleName(), "On Start");
 
     }
 

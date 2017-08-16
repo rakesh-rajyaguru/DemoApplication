@@ -7,9 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import  android.support.v7.widget.AppCompatImageView;
 
 /**
  * Created by rakesh_rajyaguru
@@ -24,19 +24,15 @@ public class PeekThroughImageView extends AppCompatImageView {
     private float x;
     private float y;
     private boolean shouldDrawOpening = false;
-
     public PeekThroughImageView(Context context) {
         super(context);
     }
-
     public PeekThroughImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-
     public PeekThroughImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
@@ -55,7 +51,7 @@ public class PeekThroughImageView extends AppCompatImageView {
             Bitmap original = Bitmap.createBitmap(
                     getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
             Canvas originalCanvas = new Canvas(original);
-            super.onDraw(originalCanvas);    // ImageView
+            super.onDraw(originalCanvas);             // ImageView
 
             Shader shader = new BitmapShader(original,
                     Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);

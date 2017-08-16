@@ -62,7 +62,6 @@ public class AplicatinTrackerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         Log.e(getClass().getSimpleName(), "onCreate");
-
     }
 
     @Nullable
