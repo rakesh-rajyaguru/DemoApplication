@@ -76,9 +76,7 @@ public class AplicatinTrackerFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity) getActivity();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            initComponent();
-        }
+        initComponent();
         Log.e("Method Call", "onActivity Created");
     }
 
@@ -140,7 +138,6 @@ public class AplicatinTrackerFragment extends Fragment {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initComponent() {
         if (getView() == null) {
             return;
@@ -173,7 +170,10 @@ public class AplicatinTrackerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 generatePage();
-                GeneratePdfDocument(mActivity);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    GeneratePdfDocument(mActivity);
+                }
+
             }
         });
     }

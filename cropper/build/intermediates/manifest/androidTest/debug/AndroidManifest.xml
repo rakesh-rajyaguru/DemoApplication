@@ -3,8 +3,8 @@
     package="com.theartofdev.edmodo.cropper.test" >
 
     <uses-sdk
-        android:minSdkVersion="10"
-        android:targetSdkVersion="25" />
+        android:minSdkVersion="16"
+        android:targetSdkVersion="22" />
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
@@ -13,12 +13,12 @@
         android:label="Tests for com.theartofdev.edmodo.cropper.test"
         android:targetPackage="com.theartofdev.edmodo.cropper.test" />
 
-    <meta-data
-        android:name="android.support.VERSION"
-        android:value="25.3.1" />
-
     <application>
         <uses-library android:name="android.test.runner" />
+
+        <meta-data
+            android:name="android.support.VERSION"
+            android:value="26.0.1" />
     </application>
 
 </manifest>

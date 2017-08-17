@@ -15,11 +15,20 @@ allprojects {
     repositories {
         jcenter()
         maven { url "https://www.jitpack.io" }
-        maven {
-            url "https://maven.google.com"
-        }
+        maven { url "https://maven.google.com" }
 
     }
+}
+ext {
+    PLAY_SERVICE_VERSION = '11.0.4'
+    BUILd_TOOL = '26.0.1'
+    SUPPORT_VERSION = '26.0.1'
+    TARGET_SDK = 22
+    COMPILE_SDK = 26
+    MIN_SDK = 16
+    PUBLISH_GROUP_ID = 'com.theartofdev.edmodo'
+    PUBLISH_ARTIFACT_ID = 'android-image-cropper'
+    PUBLISH_VERSION = '2.4.6'
 }
 
 

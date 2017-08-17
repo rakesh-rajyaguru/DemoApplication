@@ -3,8 +3,8 @@
     package="com.hendrix.pdfdroid.test" >
 
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="25" />
+        android:minSdkVersion="16"
+        android:targetSdkVersion="22" />
 
     <instrumentation
         android:name="android.support.test.runner.AndroidJUnitRunner"
@@ -13,12 +13,12 @@
         android:label="Tests for com.hendrix.pdfdroid.test"
         android:targetPackage="com.hendrix.pdfdroid.test" />
 
-    <meta-data
-        android:name="android.support.VERSION"
-        android:value="25.3.1" />
-
     <application android:allowBackup="true" >
         <uses-library android:name="android.test.runner" />
+
+        <meta-data
+            android:name="android.support.VERSION"
+            android:value="26.0.1" />
     </application>
 
 </manifest>

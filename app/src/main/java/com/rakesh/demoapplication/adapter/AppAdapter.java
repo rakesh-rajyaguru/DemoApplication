@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.github.thunder413.datetimeutils.DateTimeStyle;
 import com.github.thunder413.datetimeutils.DateTimeUtils;
 import com.rakesh.demoapplication.R;
 import com.rakesh.demoapplication.pojo.AppList;
@@ -81,9 +82,9 @@ public class AppAdapter extends BaseAdapter {
         PopupMenu popup = new PopupMenu(mContext, v);
         popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
         popup.getMenu().getItem(0).setTitle("Install " + DateTimeUtils.getTimeAgo(mContext,
-                new Date(appinfo.getFirstinstall())));
+                new Date(appinfo.getFirstinstall()), DateTimeStyle.AGO_FULL_STRING));
         popup.getMenu().getItem(1).setTitle("Update " + DateTimeUtils.getTimeAgo(mContext,
-                new Date(appinfo.getUpdatetime())));
+                new Date(appinfo.getUpdatetime()), DateTimeStyle.AGO_FULL_STRING));
 
         //registering popup with OnMenuItemClickListener
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
